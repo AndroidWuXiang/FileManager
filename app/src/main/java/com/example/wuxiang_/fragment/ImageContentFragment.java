@@ -75,7 +75,20 @@ public class ImageContentFragment extends Fragment {
                     if (view.getLastVisiblePosition() == view.getCount() - 1) {
                         //加载更多功能的代码
                         sysImageList.clear();
-                        new LoadImage().execute();
+                       /* new LoadImage().execute();*/
+                        new Thread(){
+                            @Override
+                            public void run() {
+                                super.run();
+                                try{
+                                    sleep(200);
+                                    new LoadImage().execute();
+                                }catch (Exception e){
+
+                                }
+
+                            }
+                        }.start();
                     }
                 }
             }
@@ -105,9 +118,9 @@ public class ImageContentFragment extends Fragment {
     class LoadImage extends AsyncTask<Void,Void,ArrayList<ImageInfo>>{
         @Override
         protected ArrayList<ImageInfo> doInBackground(Void... params) {
-
+            ArrayList<ImageInfo> results = new  ArrayList<ImageInfo>();
             cursor = getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    mediaColumns, null, null, "_id asc LIMIT  "+count);
+                    mediaColumns, null, null, "_id asc LIMIT  "+(count-6)+","+count);
 
             if(cursor==null){
                 //Toast.makeText(ImageContentFragment.this, "没有找到可播放视频文件", 1).show();
@@ -144,11 +157,11 @@ public class ImageContentFragment extends Fragment {
                             .getString(cursor
                                     .getColumnIndexOrThrow(MediaStore.Images.Media.MIME_TYPE)));
 
-                    sysImageList.add(info);
+                    results.add(info);
                 } while (cursor.moveToNext());
             }
             cursor.close();
-            return sysImageList;
+            return results;
         }
 
         @Override
@@ -183,7 +196,7 @@ public class ImageContentFragment extends Fragment {
                         return false;
                     }
                 });*/
-
+                sysImageList = results;
                 listView.setAdapter(baseAdapter);
                 Toast.makeText(getContext(), "图片数目："+sysImageList.size(),Toast.LENGTH_SHORT).show();
             }
@@ -271,7 +284,7 @@ public class ImageContentFragment extends Fragment {
                 public void run() {
                     super.run();
                     try{
-                        sleep(300);
+                        sleep(200);
                         new LoadImage().execute();
                     }catch (Exception e){
 
