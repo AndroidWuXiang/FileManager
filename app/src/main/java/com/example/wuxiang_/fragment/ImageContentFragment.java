@@ -47,6 +47,7 @@ public class ImageContentFragment extends Fragment {
     public static ArrayList<ImageInfo> sysImageList;// 图片信息集合
     private Cursor cursor;
     private int count = 6;
+    int totalCount = 0;
     public MyBaseAdapter baseAdapter;
     // MediaStore.Images.Thumbnails.DATA:图片缩略图的文件路径
     //String[] thumbColumns = { MediaStore.Images.Thumbnails.DATA,
@@ -66,6 +67,12 @@ public class ImageContentFragment extends Fragment {
         currentView = inflater.inflate(R.layout.fragment_image,
                 container,false);
         listView = (ListView)currentView.findViewById(R.id.lv_image);
+        sysImageList = new ArrayList<ImageInfo>();
+        //new LoadImage().execute();
+        baseAdapter = new MyBaseAdapter();
+       /* cursor = getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    mediaColumns, null, null, null);*/
+
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -74,7 +81,7 @@ public class ImageContentFragment extends Fragment {
                     // 判断是否滚动到底部
                     if (view.getLastVisiblePosition() == view.getCount() - 1) {
                         //加载更多功能的代码
-                        sysImageList.clear();
+                        //sysImageList.clear();
                        /* new LoadImage().execute();*/
                         new Thread(){
                             @Override
@@ -98,9 +105,20 @@ public class ImageContentFragment extends Fragment {
 
             }
         });
-        sysImageList = new ArrayList<ImageInfo>();
-        //new LoadImage().execute();
-        baseAdapter = new MyBaseAdapter();
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                try{
+                    sleep(300);
+                    new LoadImage().execute();
+                }catch (Exception e){
+
+                }
+
+            }
+        }.start();
+
         return currentView;
     }
 
@@ -120,7 +138,7 @@ public class ImageContentFragment extends Fragment {
         protected ArrayList<ImageInfo> doInBackground(Void... params) {
             ArrayList<ImageInfo> results = new  ArrayList<ImageInfo>();
             cursor = getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    mediaColumns, null, null, "_id asc LIMIT  "+(count-6)+","+count);
+                    mediaColumns, null, null, "_id asc LIMIT  "+0+","+count);
 
             if(cursor==null){
                 //Toast.makeText(ImageContentFragment.this, "没有找到可播放视频文件", 1).show();
@@ -129,7 +147,6 @@ public class ImageContentFragment extends Fragment {
 
 
             if (cursor.moveToFirst()) {
-                count+=6;
                 do {
                     ImageInfo info = new ImageInfo();
                     /*int id = cursor.getInt(cursor
@@ -158,8 +175,10 @@ public class ImageContentFragment extends Fragment {
                                     .getColumnIndexOrThrow(MediaStore.Images.Media.MIME_TYPE)));
 
                     results.add(info);
+                    totalCount++;
                 } while (cursor.moveToNext());
             }
+            count+=6;
             cursor.close();
             return results;
         }
@@ -196,9 +215,13 @@ public class ImageContentFragment extends Fragment {
                         return false;
                     }
                 });*/
-                sysImageList = results;
-                listView.setAdapter(baseAdapter);
-                Toast.makeText(getContext(), "图片数目："+sysImageList.size(),Toast.LENGTH_SHORT).show();
+                sysImageList.removeAll(sysImageList);
+                //sysImageList = results;
+                sysImageList.addAll(results);
+                //listView.setAdapter(baseAdapter);
+                listView.setAdapter(new MyBaseAdapter());
+                listView.setSelection(count-6);
+                Toast.makeText(getContext(), "图片数目："+totalCount,Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -220,20 +243,6 @@ public class ImageContentFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                try{
-                    sleep(300);
-                    new LoadImage().execute();
-                }catch (Exception e){
-
-                }
-
-            }
-        }.start();
-
     }
     class MyBaseAdapter extends BaseAdapter{
         @Override
