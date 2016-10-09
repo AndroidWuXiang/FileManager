@@ -3,10 +3,12 @@ package com.example.wuxiang_.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.wuxiang_.myapplication.R;
 
@@ -46,7 +48,9 @@ import com.example.wuxiang_.myapplication.R;
 
 
     public void initBottomView(){
-        footerView = LayoutInflater.from(this.context).inflate(R.layout.listview_bottom,null);
+        footerView = LayoutInflater.from(context).inflate(R.layout.listview_bottom,null);
+        TextView t = (TextView) footerView.findViewById(R.id.lv_tv_1);
+        Log.e("wuxiang",t.getText()+"@@@@@@@");
         addFooterView(footerView);
     }
 
@@ -67,12 +71,12 @@ import com.example.wuxiang_.myapplication.R;
 
         if (footerView != null) {
             //判断可视Item是否能在当前页面完全显示
-            if (visibleItemCount == totalItemCount) {
+            if (visibleItemCount < totalItemCount) {
                 // removeFooterView(footerView);
-                footerView.setVisibility(View.GONE);//隐藏底部布局
+                footerView.setVisibility(View.VISIBLE);//隐藏底部布局
             } else {
                 // addFooterView(footerView);
-                footerView.setVisibility(View.VISIBLE);//显示底部布局
+                footerView.setVisibility(View.GONE);//显示底部布局
             }
         }
     }

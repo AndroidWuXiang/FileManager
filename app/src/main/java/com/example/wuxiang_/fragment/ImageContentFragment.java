@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,11 +68,13 @@ public class ImageContentFragment extends Fragment {
 
         currentView = inflater.inflate(R.layout.fragment_image,
                 container,false);
+        baseAdapter = new MyBaseAdapter();
         listView = (MyPullUpListView)currentView.findViewById(R.id.lv_image);
         listView.initBottomView();
         listView.setMyPullUpListViewCallBack(new MyPullUpListView.MyPullUpListViewCallBack() {
             @Override
             public void scrollBottomState() {
+
                 new Thread(){
                     @Override
                     public void run() {
@@ -89,7 +92,7 @@ public class ImageContentFragment extends Fragment {
         });
         sysImageList = new ArrayList<ImageInfo>();
         //new LoadImage().execute();
-        baseAdapter = new MyBaseAdapter();
+
        /* cursor = getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                     mediaColumns, null, null, null);*/
 
@@ -238,13 +241,14 @@ public class ImageContentFragment extends Fragment {
                 sysImageList.removeAll(sysImageList);
                 //sysImageList = results;
                 sysImageList.addAll(results);
-                //listView.setAdapter(baseAdapter);
+
                 listView.setAdapter(baseAdapter);
+
                 listView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_DISABLED);
 
                 baseAdapter.notifyDataSetChanged();
 
-                listView.setSelection(count-6);
+                //listView.setSelection(count-6);
                 Toast.makeText(getContext(), "图片数目："+count,Toast.LENGTH_SHORT).show();
             }
         }
