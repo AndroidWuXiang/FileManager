@@ -71,16 +71,16 @@ public class ImageContentFragment extends Fragment {
         baseAdapter = new MyBaseAdapter();
         listView = (MyPullUpListView)currentView.findViewById(R.id.lv_image);
         listView.initBottomView();
-        listView.setMyPullUpListViewCallBack(new MyPullUpListView.MyPullUpListViewCallBack() {
+      /*  listView.setMyPullUpListViewCallBack(new MyPullUpListView.MyPullUpListViewCallBack() {
             @Override
             public void scrollBottomState() {
-
+                Toast.makeText(getContext(), "图片数目",Toast.LENGTH_SHORT).show();
                 new Thread(){
                     @Override
                     public void run() {
                         super.run();
                         try{
-                            sleep(200);
+                            *//*sleep(200);*//*
                             new LoadImage().execute();
                         }catch (Exception e){
 
@@ -89,14 +89,14 @@ public class ImageContentFragment extends Fragment {
                     }
                 }.start();
             }
-        });
+        });*/
         sysImageList = new ArrayList<ImageInfo>();
         //new LoadImage().execute();
 
        /* cursor = getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                     mediaColumns, null, null, null);*/
 
- /*        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
                 // 当不滚动时
@@ -105,7 +105,7 @@ public class ImageContentFragment extends Fragment {
                     if (view.getLastVisiblePosition() == view.getCount() - 1) {
                         //加载更多功能的代码
                         //sysImageList.clear();
-                       *//**//* new LoadImage().execute();*//**//*
+
                         new Thread(){
                             @Override
                             public void run() {
@@ -127,7 +127,7 @@ public class ImageContentFragment extends Fragment {
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 
             }
-        });*/
+        });
         new Thread(){
             @Override
             public void run() {
@@ -164,7 +164,7 @@ public class ImageContentFragment extends Fragment {
                     mediaColumns, null, null, "_id asc LIMIT  "+0+","+count);
 
             if(cursor==null){
-                //Toast.makeText(ImageContentFragment.this, "没有找到可播放视频文件", 1).show();
+
                 return null;
             }
 
@@ -198,10 +198,10 @@ public class ImageContentFragment extends Fragment {
                                     .getColumnIndexOrThrow(MediaStore.Images.Media.MIME_TYPE)));
 
                     results.add(info);
-                    totalCount++;
+                    count++;
                 } while (cursor.moveToNext());
             }
-            count+=6;
+
             cursor.close();
             return results;
         }
@@ -247,9 +247,13 @@ public class ImageContentFragment extends Fragment {
                 listView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_DISABLED);
 
                 baseAdapter.notifyDataSetChanged();
-
-                //listView.setSelection(count-6);
-                Toast.makeText(getContext(), "图片数目："+count,Toast.LENGTH_SHORT).show();
+                if(count>12){
+                    listView.setSelection(count-12);
+                }
+                else{
+                    listView.setSelection(0);
+                }
+                /*Toast.makeText(getContext(), "图片数目",Toast.LENGTH_SHORT).show();*/
             }
         }
 

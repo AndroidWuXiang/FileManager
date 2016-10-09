@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
@@ -50,7 +51,6 @@ import com.example.wuxiang_.myapplication.R;
     public void initBottomView(){
         footerView = LayoutInflater.from(context).inflate(R.layout.listview_bottom,null);
         TextView t = (TextView) footerView.findViewById(R.id.lv_tv_1);
-        Log.e("wuxiang",t.getText()+"@@@@@@@");
         addFooterView(footerView);
     }
 
@@ -59,10 +59,22 @@ import com.example.wuxiang_.myapplication.R;
         //当滑动到底部时
         if (scrollState == OnScrollListener.SCROLL_STATE_IDLE
                 && firstVisibleItem != 0) {
-            myPullUpListViewCallBack.scrollBottomState();
+            //myPullUpListViewCallBack.scrollBottomState();
         }
 
     }
+
+    /*@Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        switch (ev.getAction()){
+            case MotionEvent.ACTION_DOWN:{
+                footerView.setVisibility(View.VISIBLE);
+                myPullUpListViewCallBack.scrollBottomState();
+            }
+        }
+        return super.onTouchEvent(ev);
+
+    }*/
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
@@ -73,10 +85,10 @@ import com.example.wuxiang_.myapplication.R;
             //判断可视Item是否能在当前页面完全显示
             if (visibleItemCount < totalItemCount) {
                 // removeFooterView(footerView);
-                footerView.setVisibility(View.VISIBLE);//隐藏底部布局
+                footerView.setVisibility(View.GONE);//隐藏底部布局
             } else {
                 // addFooterView(footerView);
-                footerView.setVisibility(View.GONE);//显示底部布局
+                footerView.setVisibility(View.VISIBLE);//显示底部布局
             }
         }
     }
