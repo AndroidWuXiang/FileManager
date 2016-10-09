@@ -29,6 +29,7 @@ import android.widget.Toast;
 import com.example.wuxiang_.com.example.wuxiang_.daobean.ImageInfo;
 
 import com.example.wuxiang_.myapplication.R;
+import com.example.wuxiang_.view.MyPullUpListView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +43,7 @@ import java.util.HashMap;
 public class ImageContentFragment extends Fragment {
 
     private View currentView;
-    private ListView listView;
+    private MyPullUpListView listView;
     //private ArrayList<HashMap<String, Object>> listItems;
     public static ArrayList<ImageInfo> sysImageList;// 图片信息集合
     private Cursor cursor;
@@ -66,14 +67,33 @@ public class ImageContentFragment extends Fragment {
 
         currentView = inflater.inflate(R.layout.fragment_image,
                 container,false);
-        listView = (ListView)currentView.findViewById(R.id.lv_image);
+        listView = (MyPullUpListView)currentView.findViewById(R.id.lv_image);
+        listView.initBottomView();
+        listView.setMyPullUpListViewCallBack(new MyPullUpListView.MyPullUpListViewCallBack() {
+            @Override
+            public void scrollBottomState() {
+                new Thread(){
+                    @Override
+                    public void run() {
+                        super.run();
+                        try{
+                            sleep(200);
+                            new LoadImage().execute();
+                        }catch (Exception e){
+
+                        }
+
+                    }
+                }.start();
+            }
+        });
         sysImageList = new ArrayList<ImageInfo>();
         //new LoadImage().execute();
         baseAdapter = new MyBaseAdapter();
        /* cursor = getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                     mediaColumns, null, null, null);*/
 
-        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+ /*        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
                 // 当不滚动时
@@ -82,7 +102,7 @@ public class ImageContentFragment extends Fragment {
                     if (view.getLastVisiblePosition() == view.getCount() - 1) {
                         //加载更多功能的代码
                         //sysImageList.clear();
-                       /* new LoadImage().execute();*/
+                       *//**//* new LoadImage().execute();*//**//*
                         new Thread(){
                             @Override
                             public void run() {
@@ -104,7 +124,7 @@ public class ImageContentFragment extends Fragment {
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 
             }
-        });
+        });*/
         new Thread(){
             @Override
             public void run() {
@@ -225,7 +245,7 @@ public class ImageContentFragment extends Fragment {
                 baseAdapter.notifyDataSetChanged();
 
                 listView.setSelection(count-6);
-                Toast.makeText(getContext(), "图片数目："+totalCount,Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "图片数目："+count,Toast.LENGTH_SHORT).show();
             }
         }
 

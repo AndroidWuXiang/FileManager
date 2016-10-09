@@ -4,7 +4,7 @@
     android:layout_height="match_parent">
 
 
-    <ListView
+    <com.example.wuxiang_.view.MyPullUpListView
         android:id="@+id/lv_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
