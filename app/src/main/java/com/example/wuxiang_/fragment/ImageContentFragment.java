@@ -219,7 +219,11 @@ public class ImageContentFragment extends Fragment {
                 //sysImageList = results;
                 sysImageList.addAll(results);
                 //listView.setAdapter(baseAdapter);
-                listView.setAdapter(new MyBaseAdapter());
+                listView.setAdapter(baseAdapter);
+                listView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_DISABLED);
+
+                baseAdapter.notifyDataSetChanged();
+
                 listView.setSelection(count-6);
                 Toast.makeText(getContext(), "图片数目："+totalCount,Toast.LENGTH_SHORT).show();
             }
