@@ -8,13 +8,14 @@ import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
 
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,10 +31,8 @@ import android.widget.Toast;
 import com.example.wuxiang_.com.example.wuxiang_.daobean.ImageInfo;
 
 import com.example.wuxiang_.myapplication.R;
-import com.example.wuxiang_.view.MyPullUpListView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 
 /**
@@ -44,13 +43,22 @@ import java.util.HashMap;
 public class ImageContentFragment extends Fragment {
 
     private View currentView;
-    private MyPullUpListView listView;
+    private ListView listView;
     //private ArrayList<HashMap<String, Object>> listItems;
     public static ArrayList<ImageInfo> sysImageList;// 图片信息集合
     private Cursor cursor;
     private int count = 6;
-    int totalCount = 0;
     public MyBaseAdapter baseAdapter;
+
+
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            new LoadImage().execute();
+        }
+    };
+
     // MediaStore.Images.Thumbnails.DATA:图片缩略图的文件路径
     //String[] thumbColumns = { MediaStore.Images.Thumbnails.DATA,
      //       MediaStore.Images.Thumbnails.IMAGE_ID };
@@ -69,32 +77,12 @@ public class ImageContentFragment extends Fragment {
         currentView = inflater.inflate(R.layout.fragment_image,
                 container,false);
         baseAdapter = new MyBaseAdapter();
-        listView = (MyPullUpListView)currentView.findViewById(R.id.lv_image);
-        listView.initBottomView();
-      /*  listView.setMyPullUpListViewCallBack(new MyPullUpListView.MyPullUpListViewCallBack() {
-            @Override
-            public void scrollBottomState() {
-                Toast.makeText(getContext(), "图片数目",Toast.LENGTH_SHORT).show();
-                new Thread(){
-                    @Override
-                    public void run() {
-                        super.run();
-                        try{
-                            *//*sleep(200);*//*
-                            new LoadImage().execute();
-                        }catch (Exception e){
+        listView = (ListView) currentView.findViewById(R.id.lv_image);
+        cursor = getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                mediaColumns, null, null, null);
 
-                        }
-
-                    }
-                }.start();
-            }
-        });*/
         sysImageList = new ArrayList<ImageInfo>();
-        //new LoadImage().execute();
 
-       /* cursor = getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    mediaColumns, null, null, null);*/
 
          listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -112,7 +100,8 @@ public class ImageContentFragment extends Fragment {
                                 super.run();
                                 try{
                                     sleep(200);
-                                    new LoadImage().execute();
+                                    //new LoadImage().execute();
+                                    handler.sendEmptyMessage(0);
                                 }catch (Exception e){
 
                                 }
@@ -133,8 +122,8 @@ public class ImageContentFragment extends Fragment {
             public void run() {
                 super.run();
                 try{
-                    sleep(300);
-                    new LoadImage().execute();
+                    //sleep(300);
+                    handler.sendEmptyMessage(0);
                 }catch (Exception e){
 
                 }
@@ -160,8 +149,8 @@ public class ImageContentFragment extends Fragment {
         @Override
         protected ArrayList<ImageInfo> doInBackground(Void... params) {
             ArrayList<ImageInfo> results = new  ArrayList<ImageInfo>();
-            cursor = getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    mediaColumns, null, null, "_id asc LIMIT  "+0+","+count);
+         /*   cursor = getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    mediaColumns, null, null, "_id asc LIMIT  "+(count-6)+","+count);*/
 
             if(cursor==null){
 
@@ -198,11 +187,12 @@ public class ImageContentFragment extends Fragment {
                                     .getColumnIndexOrThrow(MediaStore.Images.Media.MIME_TYPE)));
 
                     results.add(info);
-                    count++;
+
                 } while (cursor.moveToNext());
             }
 
             cursor.close();
+            //count+=6;
             return results;
         }
 
@@ -238,7 +228,7 @@ public class ImageContentFragment extends Fragment {
                         return false;
                     }
                 });*/
-                sysImageList.removeAll(sysImageList);
+                //sysImageList.removeAll(sysImageList);
                 //sysImageList = results;
                 sysImageList.addAll(results);
 
@@ -247,13 +237,7 @@ public class ImageContentFragment extends Fragment {
                 listView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_DISABLED);
 
                 baseAdapter.notifyDataSetChanged();
-                if(count>12){
-                    listView.setSelection(count-12);
-                }
-                else{
-                    listView.setSelection(0);
-                }
-                /*Toast.makeText(getContext(), "图片数目",Toast.LENGTH_SHORT).show();*/
+
             }
         }
 
@@ -266,11 +250,6 @@ public class ImageContentFragment extends Fragment {
 
 
 
-    /*@Override
-    public void onStart() {
-        super.onStart();
-        new LoadImage().execute();
-    }*/
 
     @Override
     public void onResume() {
@@ -315,7 +294,7 @@ public class ImageContentFragment extends Fragment {
         ImageView imageView;
 
     }
-    //下拉刷新
+    /*//下拉刷新
     class Refresh extends AsyncTask<Void,Void,Void>{
         @Override
         protected Void doInBackground(Void... params) {
@@ -325,7 +304,7 @@ public class ImageContentFragment extends Fragment {
                 public void run() {
                     super.run();
                     try{
-                        sleep(200);
+                        sleep(300);
                         new LoadImage().execute();
                     }catch (Exception e){
 
@@ -341,7 +320,7 @@ public class ImageContentFragment extends Fragment {
             super.onPostExecute(aVoid);
 
         }
-    }
+    }*/
 
     @Override
     public void onPause() {

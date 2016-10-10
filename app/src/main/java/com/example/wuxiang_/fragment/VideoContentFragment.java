@@ -5,6 +5,8 @@ import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -34,6 +36,13 @@ public class VideoContentFragment extends Fragment {
     private ListView listView;
     public static ArrayList<VideoInfo> sysVideoList;// 图片信息集合
     private Cursor cursor;
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            new VideoAsynck().execute();
+        }
+    };
     String[] mediaColumns = { MediaStore.Video.Media._ID,
             MediaStore.Video.Media.DATA, MediaStore.Video.Media.TITLE,
             MediaStore.Video.Media.MIME_TYPE,
@@ -46,7 +55,22 @@ public class VideoContentFragment extends Fragment {
         currentView = inflater.inflate(R.layout.fragment_image,null);
         listView = (ListView)currentView.findViewById(R.id.lv_image);
         sysVideoList = new ArrayList<VideoInfo>();
+        cursor = getContext().getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                mediaColumns, null, null, null);
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                try{
+                    //sleep(300);
+                    handler.sendEmptyMessage(0);
 
+                }catch (Exception e){
+
+                }
+
+            }
+        }.start();
         return currentView;
     }
     class VideoBaseAdapter extends BaseAdapter{
@@ -96,13 +120,15 @@ public class VideoContentFragment extends Fragment {
             if(videoInfos == null){
                 Toast.makeText(getContext(), "没有找到图片文件",Toast.LENGTH_SHORT).show();
             }
+            sysVideoList.addAll(videoInfos);
             listView.setAdapter(new VideoBaseAdapter());
         }
 
         @Override
         protected ArrayList<VideoInfo> doInBackground(Void... params) {
-            cursor = getContext().getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                    mediaColumns, null, null, "_id asc LIMIT 6 ");
+            /*cursor = getContext().getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                    mediaColumns, null, null, null);*/
+            ArrayList<VideoInfo> results = new ArrayList<VideoInfo>();
             if(cursor==null){
                 Toast.makeText(getContext(), "没有找到可播放视频文件", Toast.LENGTH_SHORT).show();
                 return null;
@@ -125,30 +151,10 @@ public class VideoContentFragment extends Fragment {
                     info.setDisplayName(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME)));
                     info.setPath(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA)));
                     info.setMimeType(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.MIME_TYPE)));
-                    sysVideoList.add(info);
+                    results.add(info);
                 }while (cursor.moveToNext());
             }
-            return sysVideoList;
+            return results;
         }
-    }
-    @Override
-    public void onResume() {
-        super.onResume();
-        new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                try{
-                    sleep(300);
-                    new VideoAsynck().execute();
-
-                }catch (Exception e){
-
-                }
-
-            }
-        }.start();
-
-
     }
 }
