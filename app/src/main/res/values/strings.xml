@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">My Application</string>
+    <string name="menu_title">多媒体文件</string>
 </resources>

@@ -9,6 +9,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -54,6 +56,32 @@ public class MainActivity extends AppCompatActivity  {
         dw = (DrawerLayout)this.findViewById(R.id.drawer_layout);
         mDrawerLayout =(DrawerLayout)this.findViewById(R.id.drawer_layout);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_personal:
+                dw.openDrawer(listView);
+                break;
+            case android.R.id.home:
+                dw.closeDrawer(listView);
+                break;
+            default:
+                break;
+
+        }
+            return super.onOptionsItemSelected(item);
+    }
+
     public void setItem(int position){
 
        switch(position){
